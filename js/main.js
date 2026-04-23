@@ -5,24 +5,73 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     /* ========== Mobile Navigation ========== */
-    const navToggle = document.querySelector('.nav-toggle');
-    const navWrapper = document.querySelector('.header__nav-wrapper');
+    var navToggle = document.querySelector('.nav-toggle');
+    var navWrapper = document.querySelector('.header__nav-wrapper');
+    var headerEl = document.querySelector('.header__inner');
+    var overlay = document.createElement('div');
+    overlay.className = 'nav-overlay';
+    document.body.appendChild(overlay);
+
+    var scrollPos = 0;
+    var menuIsOpen = false;
+
+    function openMenu() {
+        scrollPos = window.pageYOffset;
+        document.body.appendChild(navWrapper);
+        navToggle.classList.add('is-open');
+        requestAnimationFrame(function () {
+            navWrapper.classList.add('is-open');
+        });
+        overlay.classList.add('is-visible');
+        navToggle.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('menu-open');
+        document.body.style.top = -scrollPos + 'px';
+        menuIsOpen = true;
+    }
+
+    function closeMenu() {
+        navToggle.classList.remove('is-open');
+        navWrapper.classList.remove('is-open');
+        overlay.classList.remove('is-visible');
+        navToggle.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('menu-open');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollPos);
+        menuIsOpen = false;
+        setTimeout(function () {
+            if (!menuIsOpen) {
+                headerEl.appendChild(navWrapper);
+            }
+        }, 350);
+    }
 
     if (navToggle && navWrapper) {
-        navToggle.addEventListener('click', function () {
-            navToggle.classList.toggle('is-open');
-            navWrapper.classList.toggle('is-open');
-            const isOpen = navToggle.classList.contains('is-open');
-            navToggle.setAttribute('aria-expanded', isOpen);
+        navToggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (navToggle.classList.contains('is-open')) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
         });
 
-        // Закрываем меню при клике на ссылку
+        overlay.addEventListener('click', closeMenu);
+
         document.querySelectorAll('.nav__link').forEach(function (link) {
-            link.addEventListener('click', function () {
-                navToggle.classList.remove('is-open');
-                navWrapper.classList.remove('is-open');
-                navToggle.setAttribute('aria-expanded', 'false');
-            });
+            link.addEventListener('click', closeMenu);
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && navToggle.classList.contains('is-open')) {
+                closeMenu();
+            }
+        });
+
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 880 && navToggle.classList.contains('is-open')) {
+                closeMenu();
+            }
         });
     }
 

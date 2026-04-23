@@ -314,7 +314,7 @@ h3, .h3 {
 .header {
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 300;
     background-color: rgba(10, 14, 20, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -472,31 +472,57 @@ h3, .h3 {
 /* Mobile nav toggle */
 .nav-toggle {
     display: none;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     padding: 0;
     background: transparent;
     position: relative;
     cursor: pointer;
-    z-index: 110;
+    z-index: 210;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 .nav-toggle span {
     position: absolute;
-    left: 9px;
-    right: 9px;
+    left: 10px;
+    right: 10px;
     height: 2px;
     background: var(--color-text-inverse);
     border-radius: 2px;
-    transition: all var(--t-base);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    pointer-events: none;
 }
-.nav-toggle span:nth-child(1) { top: 13px; }
-.nav-toggle span:nth-child(2) { top: 19px; }
-.nav-toggle span:nth-child(3) { top: 25px; }
+.nav-toggle span:nth-child(1) { top: 14px; }
+.nav-toggle span:nth-child(2) { top: 21px; }
+.nav-toggle span:nth-child(3) { top: 28px; }
 
-.nav-toggle.is-open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-.nav-toggle.is-open span:nth-child(2) { opacity: 0; }
-.nav-toggle.is-open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+.nav-toggle.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle.is-open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-toggle.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Body scroll lock when menu is open */
+body.menu-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+
+/* Mobile overlay */
+.nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.nav-overlay.is-visible {
+    opacity: 1;
+}
 
 /* ============================================
    Hero Section
@@ -1993,26 +2019,41 @@ h3, .h3 {
         display: block;
     }
 
+    .nav-overlay {
+        display: block;
+        pointer-events: none;
+    }
+
+    .nav-overlay.is-visible {
+        pointer-events: auto;
+    }
+
     .header__nav-wrapper {
         position: fixed;
-        top: 76px;
-        left: 0;
+        top: 0;
         right: 0;
         bottom: 0;
+        width: 85%;
+        max-width: 360px;
+        z-index: 200;
         background: var(--color-bg);
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-        padding: var(--space-8) var(--space-6);
+        border-left: 1px solid rgba(255, 255, 255, 0.08);
+        padding: calc(76px + var(--space-8)) var(--space-6) var(--space-8);
         flex-direction: column;
         align-items: stretch;
         justify-content: flex-start;
         gap: var(--space-8);
         transform: translateX(100%);
-        transition: transform var(--t-base);
+        visibility: hidden;
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                    visibility 0.35s;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .header__nav-wrapper.is-open {
         transform: translateX(0);
+        visibility: visible;
     }
 
     .nav {
@@ -2025,12 +2066,14 @@ h3, .h3 {
     .nav__link {
         padding: var(--space-4) var(--space-5);
         border-radius: var(--radius-md);
-        font-size: 1rem;
+        font-size: 1.05rem;
         border: 1px solid transparent;
+        -webkit-tap-highlight-color: transparent;
     }
 
-    .nav__link:hover {
-        background: rgba(255, 255, 255, 0.04);
+    .nav__link:hover,
+    .nav__link:active {
+        background: rgba(255, 255, 255, 0.06);
     }
 
     .nav__link.is-active::after {
